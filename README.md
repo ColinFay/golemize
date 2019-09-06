@@ -85,7 +85,8 @@ fs::dir_tree("060-retirement-simulation-golem")
 
   - The [functions from the
     UI](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation/ui.r#L3)
-    can be put in `R/`, as classical package functions []()
+    can be put in `R/`, as classical package functions, for example
+    [`utils_ui.R`](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/R/utils_ui.R)
 
   - The
     [UI](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation/ui.r#L26)
