@@ -1,0 +1,37 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+# golemize
+
+Example of turning a classical standard app to `{golem}`.
+
+## From github.com/rstudio/shiny-examples/060-retirement-simulation
+
+### Structure
+
+Shiny Example : 
+
+```{r}
+fs::dir_tree("060-retirement-simulation")
+```
+
+`{golem}` example: 
+
+```{r}
+fs::dir_tree("060-retirement-simulation-golem")
+```
+
+### Where to put things 
+
++ DESCRIPTION file > DESCRIPTION FILE 
+
++ 
