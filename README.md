@@ -57,16 +57,29 @@ fs::dir_tree("060-retirement-simulation-golem")
 
 #### CSS & metadata
 
-  - The css from
+In `{golem}`, the external dependencies goes into `inst/app/www`. Then,
+they need to be linked to in `app_ui.R`, in
+`golem_add_external_resources()`. If you’re creating the file with
+`add_css_file()` for example, the file will be opened and you’ll have in
+your console the piece of code to copy into app\_ui.R.
+
+  - For the example app, the css from
     [`www/simplex.min.css`](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation/www/simplex.min.css)
     goes into
     [`inst/app/www/simplex.min.css`](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/inst/app/www/simplex.min.css).
-    It’s linked in `app_ui.R`, in
-    [`golem_add_external_resources()`](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/R/app_ui.R#L56).
+    It’s linked in `app_ui.R`, inside the
+    [`golem_add_external_resources()`](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/R/app_ui.R#L56)
+    function.
 
   - DESCRIPTION file \> DESCRIPTION FILE
 
 #### Server
+
+Take your server.R file, and split it into pieces. The body of the main
+server function foes into the function skeleton in `R/app_server.R`. The
+other server functions can be placed in other files in the R/folder. The
+data defined can either be defined as golem options or it can be created
+as a package data.
 
   - The [functions from the
     server](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation/server.r#L5)
@@ -79,9 +92,12 @@ fs::dir_tree("060-retirement-simulation-golem")
     [app\_server.R](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/R/app_server.R)
 
   - [data](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation/server.r#L1)
-    can be created as [package data]().
+    can be created as [package
+    data](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/data-raw/DATASET.R).
 
 #### UI
+
+Same dance for the UI part.
 
   - The [functions from the
     UI](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation/ui.r#L3)
