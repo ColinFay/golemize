@@ -1,0 +1,191 @@
+#!/usr/bin/env Rscript
+
+# Usage: ./deploy [app]
+# Running ./deploy without any arguments will print instructions.
+#
+# Note the shiny-dev-center repository must be under the same directory of
+# this shiny-examples repository. Please ask garrett@rstudio.com if you want
+# the credentials for the account `gallery` on ShinyApps.io.
+
+if (FALSE) {
+  devtools::install_github('rstudio/shiny')
+  devtools::install_github('rstudio/rsconnect')
+}
+
+# first, copy shiny's built-in examples to this directory.
+if (file_test('-d', '../shiny/inst/examples')) {
+  for (app in list.dirs('../shiny/inst/examples', recursive = FALSE)) {
+    dir.create(app1 <- sub('^(\\d\\d)_', '0\\1-', basename(app)), showWarnings = FALSE)
+    file.copy(list.files(app, full.names = TRUE), app1, recursive = TRUE)
+  }
+}
+
+# we reused report.Rmd in example 020, so make a hard link
+system2('ln', '-f 016-knitr-pdf/report.Rmd 020-knit-html/')
+
+# a font file that is needed for the example 022
+if (!file.exists('022-unicode-chinese/wqy-zenhei.ttc')) {
+  if (!requireNamespace('curl'))
+    install.packages('curl')
+
+  curl::curl_download(
+    'https://github.com/rstudio/shiny-examples/releases/download/v0.10.1/wqy-zenhei.ttc',
+    '022-unicode-chinese/wqy-zenhei.ttc'
+  )
+}
+
+library(methods)
+library(rsconnect)
+
+# ./deploy [-d] [-p] [001-hello 002-text ...]
+args <- commandArgs(TRUE)
+
+if (length(args) == 0) {
+  cat(sep = "\n",
+    "Usage: deploy [OPTIONS] APPDIR1 APPDIR2 ...",
+    "  or   deploy [OPTIONS] --all",
+    "",
+    "Options:",
+    "  -a ACCOUNT  Use specified account name (default: testing-apps)",
+    "  -s SERVER   Deploy to specified server (default: shinyapps.io)",
+    "  -c          Number of cores to use while deploying apps. (default: 1 (serial))",
+    "  -d          Deploy only (don't publish). (default)",
+    "  -p          Publish only (don't deploy). This takes a screenshot of the app and",
+    "              adds it to ../shiny-dev-center.",
+    "  --all       Deploy all applications",
+    "",
+    "Examples:",
+    "  ./deploy 116",
+    "  ./deploy --all",
+    ""
+  )
+
+  q()
+}
+
+# Default options
+opts <- list(
+  deploy = TRUE,
+  publish = FALSE,
+  account = "testing-apps",
+  server = "shinyapps.io",
+  cores = 1,
+  all = FALSE
+)
+
+if (all(c('-d', '-p') %in% args)) {
+  stop("Can't use -d and -p together.")
+}
+if ('-d' %in% args) {
+  args <- setdiff(args, '-d')
+  opts$publish <- FALSE
+}
+if ('-p' %in% args) {
+  args <- setdiff(args, '-p')
+  opts$deploy <- FALSE
+}
+if ('-a' %in% args) {
+  optIdx <- which('-a' == args)
+  if (optIdx >= length(args)) {
+    stop("-a option must be followed with an account name")
+  }
+  opts$account <- args[optIdx + 1]
+  args <- args[-c(optIdx, optIdx+1)]
+}
+if ('-s' %in% args) {
+  optIdx <- which('-s' == args)
+  if (optIdx >= length(args)) {
+    stop("-s option must be followed with an server name")
+  }
+  opts$server <- args[optIdx + 1]
+  args <- args[-c(optIdx, optIdx+1)]
+}
+if ('-c' %in% args) {
+  optIdx <- which('-c' == args)
+  if (optIdx >= length(args)) {
+    stop("-c option must be followed by the number of cores")
+  }
+  opts$cores <- as.numeric(args[optIdx + 1])
+  args <- args[-c(optIdx, optIdx+1)]
+  if (is.na(opts$cores)) {
+    stop("number of cores should be a numeric value")
+  }
+}
+if ('--all' %in% args) {
+  args <- setdiff(args, '--all')
+  opts$all <- TRUE
+}
+
+
+apps <- character()
+
+if (opts$all) {
+  apps <- list.dirs(full.names = FALSE, recursive = FALSE)
+  apps <- grep('^[0-9]{3,}', apps, value = TRUE)
+
+} else {
+  # Can also `./deploy 001 002` without typing the full app names.
+
+  # Find abbreviated args like '001'
+  abbrevIdx <- !file_test('-d', args)
+
+  if (any(abbrevIdx)) {
+    if (!all(grep('^[0-9]{3,}$', args[abbrevIdx])))
+      stop('Unknown app name(s) ', paste(args[abbrevIdx], collapse = ', '))
+
+    fullNames <- grep(
+      paste0('^', paste(args[abbrevIdx], collapse = '|')),
+      list.dirs(recursive = FALSE, full.names = FALSE),
+      value = TRUE
+    )
+
+    apps <- c(args[!abbrevIdx], fullNames)
+  }
+}
+
+deployApps <- function(app) {
+  cat('-------- Deploying', app, '--------\n')
+  if (opts$deploy) {
+    res <- try(rsconnect::deployApp(app, account = opts$account, server = opts$server))
+    if (inherits(res, 'try-error')) {
+      return(1)
+    }
+  }
+
+  if (opts$publish) {
+    # If we get here, import the app in the shiny-dev-center
+    system(paste(
+      '../shiny-dev-center/_scripts/import.R',
+      app,
+      sprintf('https://gallery.shinyapps.io/%s', app),
+      sprintf('https://github.com/rstudio/shiny-examples/tree/master/%s', app)
+    ))
+  } else {
+    return(0)
+  }
+}
+
+# Try deploying apps and get return codes (0 is success)
+deployRes <- if (opts$cores > 1) {
+  parallel::mclapply(apps, deployApps, mc.cores = opts$cores)
+} else {
+  lapply(apps, deployApps)
+}
+deployRes <- unlist(deployRes)
+
+# Print any warnings
+deployWarnings <- warnings()
+if (length(deployWarnings) != 0) {
+  cat("\n")
+  print(deployWarnings)
+}
+
+# Print apps that were not successfully deployed
+if (any(deployRes != 0)) {
+  cat(
+    "\nError deploying apps:\n",
+    paste0("  ", apps[deployRes != 0], collapse = "\n"),
+    "\n",
+    sep = ""
+  )
+}

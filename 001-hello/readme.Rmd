@@ -1,0 +1,22 @@
+---
+output: github_document
+---
+
+# 001-hello
+ 
+Shiny Example : 
+ 
+```{r}
+fs::dir_tree('001-hello-original')
+```
+golem Example : 
+ 
+```{r}
+fs::dir_tree('001-hello-golem')
+```
+
+### Where to put things 
+
+Use [original DESCRIPTION](001-hello-original/DESCRIPTION) in [golem dev/01_start.R](001-hello-golem/dev/01_start.R)
+
+From [original app.R](001-hello-original/app.R), put the [ui function](001-hello-original/app.R#4) into golem [app_ui.R](001-hello-golem/R/app_ui.R) &  the [server function](001-hello-original/app.R#35) into golem [app_server.R](001-hello-golem/R/app_server.R)

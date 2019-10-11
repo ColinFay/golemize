@@ -1,0 +1,123 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# golemize
+
+Example of turning a classical standard app to `{golem}`.
+
+## From github.com/rstudio/shiny-examples/060-retirement-simulation
+
+### Structure
+
+Shiny Example :
+
+``` r
+fs::dir_tree("060-retirement-simulation")
+#> 060-retirement-simulation
+#> ├── DESCRIPTION
+#> ├── server.r
+#> ├── ui.r
+#> └── www
+#>     └── simplex.min.css
+```
+
+`{golem}` example:
+
+``` r
+fs::dir_tree("060-retirement-simulation-golem")
+#> 060-retirement-simulation-golem
+#> ├── 060-retirement-simulation-golem.Rproj
+#> ├── DESCRIPTION
+#> ├── NAMESPACE
+#> ├── R
+#> │   ├── app_server.R
+#> │   ├── app_ui.R
+#> │   ├── run_app.R
+#> │   ├── utils_server.R
+#> │   └── utils_ui.R
+#> ├── data
+#> │   └── paramNames.rda
+#> ├── data-raw
+#> │   └── DATASET.R
+#> ├── dev
+#> │   ├── 01_start.R
+#> │   ├── 02_dev.R
+#> │   ├── 03_deploy.R
+#> │   └── run_dev.R
+#> ├── inst
+#> │   └── app
+#> │       └── www
+#> │           ├── favicon.ico
+#> │           └── simplex.min.css
+#> └── man
+#>     └── run_app.Rd
+```
+
+### Where to put things
+
+#### CSS & metadata
+
+In `{golem}`, the external dependencies goes into `inst/app/www`. Then,
+they need to be linked to in `app_ui.R`, in
+`golem_add_external_resources()`. If you’re creating the file with
+`add_css_file()` for example, the file will be opened and you’ll have in
+your console the piece of code to copy into app\_ui.R.
+
+  - For the example app, the css from
+    [`www/simplex.min.css`](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation/www/simplex.min.css)
+    goes into
+    [`inst/app/www/simplex.min.css`](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/inst/app/www/simplex.min.css).
+    It’s linked in `app_ui.R`, inside the
+    [`golem_add_external_resources()`](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/R/app_ui.R#L56)
+    function.
+
+  - DESCRIPTION file \> DESCRIPTION FILE
+
+#### Server
+
+Take your server.R file, and split it into pieces. The body of the main
+server function foes into the function skeleton in `R/app_server.R`. The
+other server functions can be placed in other files in the R/folder. The
+data defined can either be defined as golem options or it can be created
+as a package data.
+
+  - The [functions from the
+    server](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation/server.r#L5)
+    can be put in `R/`, as classical package functions, for example
+    [`utils_server.R`](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/R/utils_server.R)
+
+  - The [server
+    function](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation/server.r#L108)
+    goes into
+    [app\_server.R](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/R/app_server.R)
+
+  - [data](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation/server.r#L1)
+    can be created as [package
+    data](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/data-raw/DATASET.R).
+
+#### UI
+
+Same dance for the UI part.
+
+  - The [functions from the
+    UI](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation/ui.r#L3)
+    can be put in `R/`, as classical package functions, for example
+    [`utils_ui.R`](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/R/utils_ui.R)
+
+  - The
+    [UI](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation/ui.r#L26)
+    function goes to
+    [app\_ui.R](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/R/app_ui.R#L7)
+
+#### Dep
+
+  - Instead of
+    [library(shiny)](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation/ui.r#L1),
+    we list `{shiny}` as a
+    [dependency](https://github.com/ColinFay/golemize/blob/master/060-retirement-simulation-golem/DESCRIPTION#L11).
+
+## Launch the `{golem}`
+
+  - You can run the whole `dev/run_dev.R` script.
+
+  - You can run `pkgload::load_all();mygolem::run_app()`
