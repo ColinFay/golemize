@@ -1,0 +1,45 @@
+---
+output: github_document
+---
+
+# 002-text
+
+Shiny Example : 
+
+```{r}
+fs::dir_tree('002-text-original')
+```
+
+golem Example : 
+
+```{r}
+fs::dir_tree('002-text-golem')
+```
+
+
+## Convert UI
+
+```{r}
+fil <- "002-text-golem/R/app_ui.R"
+golui <- readLines(fil)
+spot <- 8 # H1 is there in the template
+beg <- golui[1:(spot-1)]
+mid <- readLines(fil)[6:36]
+end <- golui[(spot+1):length(golui)]
+ui <- c(beg, mid, end)
+write(ui, fil)
+styler::style_file(fil)
+```
+
+## Convert server
+
+```{r}
+fil <- "002-text-golem/R/app_server.R"
+golser <- readLines(fil)
+beg <- golser[1:2]
+mid <- readLines("002-text-original/app.R")[41:60]
+end <- golser[4]
+serv <- c(beg, mid, end)
+write(serv, fil)
+styler::style_file(fil)
+```
