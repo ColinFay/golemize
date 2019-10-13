@@ -20,3 +20,5 @@ fs::dir_tree('001-hello-golem')
 Use [original DESCRIPTION](001-hello-original/DESCRIPTION) in [golem dev/01_start.R](001-hello-golem/dev/01_start.R)
 
 From [original app.R](001-hello-original/app.R), put the [ui function](001-hello-original/app.R#4) into golem [app_ui.R](001-hello-golem/R/app_ui.R) &  the [server function](001-hello-original/app.R#35) into golem [app_server.R](001-hello-golem/R/app_server.R)
+
+See [002-text](../002-text/) and later for a scripted way to do that.s

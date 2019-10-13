@@ -1,0 +1,15 @@
+Package: reactivity
+Title: Shiny reactivity
+Version: 0.0.0.9000
+Authors@R: person('RStudio', 'Inc', email = 'AUTHOR@MAIL.COM', role = c('cre', 'aut'))
+Description: Shiny reactivity as a golem app.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    shiny,
+    golem,
+    processx
+RoxygenNote: 6.1.1
+Suggests: 
+    testthat
